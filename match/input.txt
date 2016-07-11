@@ -1,0 +1,97 @@
+e-Learning
+http://education.emc.com
+EMC
+Flash
+X-Bricks
+XDP
+GUI
+Vmware
+vCenter
+Microsoft
+VM
+I/O
+IOPS
+SAP
+IT
+ESXi
+infiniband
+Linux
+Disk Array Enclosure (DAE)
+Storage Controllers (SC)
+Xeon
+SAS
+Fibre Channel
+iSCSI
+GbE
+TB
+GB
+Encryption
+CLI
+REST
+TCP
+Java
+KB
+SSD
+Remote Direct Memory Access (RDMA)
+RAID
+I/O
+PIN
+Clone
+SCSI
+Snapshots
+redirect-on-write
+LUN
+VPLEX
+RecoverPoint
+Cloud
+VCE
+Vblock
+VSPEX
+Recovery Point Objective (RPO) 
+Unisphere
+disaster recovery (DR) 
+API
+SRM
+ViPR
+CG
+sync
+RecoverPoint for VMs
+SAN
+VNX
+VMAX
+ProtectPoint
+Data Domain
+Oracle
+DBA
+AppSync
+Hyper-V
+MPIO
+IBiiM
+AIX
+Block Zeroing
+XCOPY
+ATS
+UNMAP
+vApps
+VMFS
+ESA
+Windows
+CPU
+FC
+SQL
+Exchange
+EMC Storage Integrator (ESI)
+SharePoint
+Openstack
+Cinder
+Cloud
+Administration
+SSH
+PuTTY
+support.emc.com
+HTTP
+RESTful
+Web
+Monitor
+LVM
+ESX
