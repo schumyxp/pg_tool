@@ -1,0 +1,4 @@
+# this is comment
+url=www.baidu.com
+user=user
+password=password
