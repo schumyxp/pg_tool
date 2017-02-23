@@ -360,8 +360,11 @@
                                     <action selector="m_download:" target="Voe-Tx-rLC" id="jnV-ud-W5p"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Coming..." id="Fal-I4-PZk">
+                            <menuItem title="Refresh" id="Fal-I4-PZk">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="m_refresh:" target="Voe-Tx-rLC" id="JJE-lU-Jl1"/>
+                                </connections>
                             </menuItem>
                         </items>
                     </menu>
@@ -458,7 +461,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <size key="minSize" width="529" height="151"/>
-                                    <size key="maxSize" width="529" height="10000000"/>
+                                    <size key="maxSize" width="531" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
@@ -479,6 +482,9 @@
                         <webPreferences key="preferences" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0">
                             <nil key="identifier"/>
                         </webPreferences>
+                        <connections>
+                            <outlet property="frameLoadDelegate" destination="Voe-Tx-rLC" id="81r-kc-0ia"/>
+                        </connections>
                     </webView>
                 </subviews>
             </view>

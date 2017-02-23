@@ -12,5 +12,7 @@
 
 //menu
 -(IBAction)m_download:(id)sender;
+-(IBAction)m_refresh:(id)sender;
+
 @end
 
