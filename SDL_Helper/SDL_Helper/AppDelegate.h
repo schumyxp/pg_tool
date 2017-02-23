@@ -10,6 +10,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
-
+//menu
+-(IBAction)m_download:(id)sender;
 @end
 

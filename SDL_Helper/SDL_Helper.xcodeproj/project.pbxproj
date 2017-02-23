@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4EF99E941E5ECB2F0094AC83 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EF99E931E5ECB2F0094AC83 /* WebKit.framework */; };
 		9327EAB61E5C704D0064B55D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9327EAB51E5C704D0064B55D /* AppDelegate.m */; };
 		9327EAB91E5C704D0064B55D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9327EAB81E5C704D0064B55D /* main.m */; };
 		9327EABB1E5C704D0064B55D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9327EABA1E5C704D0064B55D /* Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4EF99E931E5ECB2F0094AC83 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		9327EAB11E5C704D0064B55D /* SDL_Helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SDL_Helper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9327EAB41E5C704D0064B55D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9327EAB51E5C704D0064B55D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -30,17 +32,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EF99E941E5ECB2F0094AC83 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4EF99E921E5ECB2F0094AC83 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4EF99E931E5ECB2F0094AC83 /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		9327EAA81E5C704D0064B55D = {
 			isa = PBXGroup;
 			children = (
 				9327EAB31E5C704D0064B55D /* SDL_Helper */,
 				9327EAB21E5C704D0064B55D /* Products */,
+				4EF99E921E5ECB2F0094AC83 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
