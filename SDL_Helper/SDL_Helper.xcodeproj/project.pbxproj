@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E92FF6E1E69A076007A067E /* SDLDownloadFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E92FF6D1E69A076007A067E /* SDLDownloadFile.m */; };
+		4E92FF701E6BB9C6007A067E /* config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4E92FF6F1E6BB9C6007A067E /* config.plist */; };
 		4EF99E941E5ECB2F0094AC83 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EF99E931E5ECB2F0094AC83 /* WebKit.framework */; };
 		9327EAB61E5C704D0064B55D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9327EAB51E5C704D0064B55D /* AppDelegate.m */; };
 		9327EAB91E5C704D0064B55D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9327EAB81E5C704D0064B55D /* main.m */; };
 		9327EABB1E5C704D0064B55D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9327EABA1E5C704D0064B55D /* Assets.xcassets */; };
 		9327EABE1E5C704D0064B55D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9327EABC1E5C704D0064B55D /* MainMenu.xib */; };
-		9327EAC91E5C73A10064B55D /* config.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9327EAC81E5C73A10064B55D /* config.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4E92FF6C1E69A076007A067E /* SDLDownloadFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLDownloadFile.h; sourceTree = "<group>"; };
+		4E92FF6D1E69A076007A067E /* SDLDownloadFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDLDownloadFile.m; sourceTree = "<group>"; };
+		4E92FF6F1E6BB9C6007A067E /* config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
 		4EF99E931E5ECB2F0094AC83 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		9327EAB11E5C704D0064B55D /* SDL_Helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SDL_Helper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9327EAB41E5C704D0064B55D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -24,7 +28,6 @@
 		9327EABA1E5C704D0064B55D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9327EABD1E5C704D0064B55D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9327EABF1E5C704D0064B55D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9327EAC81E5C73A10064B55D /* config.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = config.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,8 +75,10 @@
 				9327EABA1E5C704D0064B55D /* Assets.xcassets */,
 				9327EABC1E5C704D0064B55D /* MainMenu.xib */,
 				9327EABF1E5C704D0064B55D /* Info.plist */,
-				9327EAC81E5C73A10064B55D /* config.txt */,
 				9327EAB71E5C704D0064B55D /* Supporting Files */,
+				4E92FF6C1E69A076007A067E /* SDLDownloadFile.h */,
+				4E92FF6D1E69A076007A067E /* SDLDownloadFile.m */,
+				4E92FF6F1E6BB9C6007A067E /* config.plist */,
 			);
 			path = SDL_Helper;
 			sourceTree = "<group>";
@@ -144,9 +149,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E92FF701E6BB9C6007A067E /* config.plist in Resources */,
 				9327EABB1E5C704D0064B55D /* Assets.xcassets in Resources */,
 				9327EABE1E5C704D0064B55D /* MainMenu.xib in Resources */,
-				9327EAC91E5C73A10064B55D /* config.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +163,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9327EAB91E5C704D0064B55D /* main.m in Sources */,
+				4E92FF6E1E69A076007A067E /* SDLDownloadFile.m in Sources */,
 				9327EAB61E5C704D0064B55D /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
