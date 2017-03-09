@@ -31,6 +31,10 @@ typedef enum : NSUInteger {
 }
 
 @property (weak) IBOutlet WebView *webview;
+@property (weak) IBOutlet WebView *webview2;
+@property (weak) IBOutlet WebView *webview3;
+@property (weak) IBOutlet WebView *webview4;
+
 @property (weak) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextView *logview;
 @property (weak) IBOutlet NSMenuItem *downloadScopeMenu;
@@ -52,7 +56,12 @@ typedef enum : NSUInteger {
     self->my_log_level = LOG_LEVEL_USer;//use LOG_LEVEL_ALL for debug
     
     [self loadconfig];
-    
+
+    self.webview.identifier = @"w0";
+    self.webview2.identifier = @"w2";
+    self.webview3.identifier = @"w3";
+    self.webview4.identifier = @"w4";
+
     //load webview
     NSString *urlText = [NSString stringWithFormat:@"%@/ws/login?wanted=assignments_projects", self->domain];
     [[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlText]]];
@@ -81,11 +90,14 @@ typedef enum : NSUInteger {
 
 - (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error forFrame:(WebFrame *)frame{
     [self appendToMyTextView:@"loading page error." log_level:LOG_LEVEL_ALL];
+    
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame{
     self->currentUrl = [[[[frame dataSource] request] URL] absoluteString];
     [self appendToMyTextView:[NSString stringWithFormat:@"finish loading %@", self->currentUrl] log_level:LOG_LEVEL_ALL];
+    [self appendToMyTextView:sender.identifier log_level:LOG_LEVEL_USer];
+
     [self pageload_Progress:false];
     
     if([self->currentUrl containsString:@"/ws/login"]){
@@ -173,7 +185,8 @@ typedef enum : NSUInteger {
         NSString *href = [link href];
         if([href containsString:@"assignments_project_info_scope"]){
             //open it
-            [[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
+            //[[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
+            [[self.webview2 mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
             return;
         }
     }
