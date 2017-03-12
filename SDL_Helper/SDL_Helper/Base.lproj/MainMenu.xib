@@ -19,8 +19,11 @@
                 <outlet property="downloadScopeMenu" destination="Gi5-1S-RQB" id="2ry-5m-Mu8"/>
                 <outlet property="download_PI" destination="JGd-GJ-Vad" id="CPx-gG-v9O"/>
                 <outlet property="logview" destination="Wol-VP-0Zd" id="bJx-AZ-eqa"/>
-                <outlet property="pageload_PI" destination="L7w-8y-LsU" id="veJ-Qc-HJN"/>
-                <outlet property="webview" destination="2Nt-LY-uLh" id="fHI-Of-bdc"/>
+                <outlet property="pageload_PI1" destination="L7w-8y-LsU" id="8Wg-RB-B3w"/>
+                <outlet property="pageload_PI2" destination="pBI-0b-ibB" id="d86-JG-zyL"/>
+                <outlet property="pageload_PI3" destination="Jen-zR-xK3" id="SzG-1l-15A"/>
+                <outlet property="pageload_PI4" destination="YD5-7N-g4S" id="2fK-Rl-7kS"/>
+                <outlet property="webview1" destination="2Nt-LY-uLh" id="E2p-Oe-tBc"/>
                 <outlet property="webview2" destination="LGF-FJ-3Ac" id="Jrq-gB-2yQ"/>
                 <outlet property="webview3" destination="59U-p0-IAZ" id="Cup-vU-1Fy"/>
                 <outlet property="webview4" destination="g1n-tE-MuX" id="Zbi-SD-jca"/>
@@ -464,11 +467,11 @@
                         </connections>
                     </webView>
                     <progressIndicator wantsLayer="YES" fixedFrame="YES" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="JGd-GJ-Vad">
-                        <rect key="frame" x="51" y="8" width="1337" height="20"/>
+                        <rect key="frame" x="10" y="8" width="1378" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="L7w-8y-LsU">
-                        <rect key="frame" x="17" y="9" width="16" height="16"/>
+                        <rect key="frame" x="554" y="415" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LGF-FJ-3Ac">
@@ -479,6 +482,10 @@
                             <outlet property="frameLoadDelegate" destination="Voe-Tx-rLC" id="YR7-sd-Mh5"/>
                         </connections>
                     </webView>
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="pBI-0b-ibB">
+                        <rect key="frame" x="1120" y="415" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    </progressIndicator>
                     <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="59U-p0-IAZ">
                         <rect key="frame" x="10" y="43" width="560" height="360"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -487,6 +494,10 @@
                             <outlet property="frameLoadDelegate" destination="Voe-Tx-rLC" id="eEt-5j-wDZ"/>
                         </connections>
                     </webView>
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="Jen-zR-xK3">
+                        <rect key="frame" x="554" y="43" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    </progressIndicator>
                     <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g1n-tE-MuX">
                         <rect key="frame" x="576" y="43" width="560" height="360"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -522,6 +533,10 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="YD5-7N-g4S">
+                        <rect key="frame" x="1120" y="43" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    </progressIndicator>
                 </subviews>
             </view>
             <point key="canvasLocation" x="559" y="636"/>

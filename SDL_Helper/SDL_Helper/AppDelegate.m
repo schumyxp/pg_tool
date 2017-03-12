@@ -16,21 +16,21 @@ typedef enum : NSUInteger {
 } LOG_LEVEL;
 
 @interface AppDelegate (){
-    NSString *currentUrl;
     NSString *mainUrl;
     NSString *domain;
     NSString *username;
     NSString *pwd;
     NSUInteger download_files_total;
-    NSUInteger download_files_done;
-    SDLDownloadFile *current_download_task;
     
     LOG_LEVEL my_log_level;
-    Boolean is_download_scope;
-    NSMutableArray *should_download_files;
+    NSMutableDictionary *webviews;
+    NSMutableDictionary *pagePIs;
+
+    NSMutableDictionary *conditions;
+    NSMutableDictionary *threadStatus;
 }
 
-@property (weak) IBOutlet WebView *webview;
+@property (weak) IBOutlet WebView *webview1;
 @property (weak) IBOutlet WebView *webview2;
 @property (weak) IBOutlet WebView *webview3;
 @property (weak) IBOutlet WebView *webview4;
@@ -38,8 +38,16 @@ typedef enum : NSUInteger {
 @property (weak) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextView *logview;
 @property (weak) IBOutlet NSMenuItem *downloadScopeMenu;
-@property (weak) IBOutlet NSProgressIndicator *pageload_PI;
+@property (weak) IBOutlet NSProgressIndicator *pageload_PI1;
+@property (weak) IBOutlet NSProgressIndicator *pageload_PI2;
+@property (weak) IBOutlet NSProgressIndicator *pageload_PI3;
+@property (weak) IBOutlet NSProgressIndicator *pageload_PI4;
+
 @property (weak) IBOutlet NSProgressIndicator *download_PI;
+
+@property (atomic) NSMutableArray *downloadTasks;
+@property (atomic) NSMutableDictionary *currentTasks;
+@property (atomic) NSUInteger download_files_done;
 
 @end
 
@@ -47,24 +55,39 @@ typedef enum : NSUInteger {
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
-    self->should_download_files = [NSMutableArray new];
-    self->is_download_scope = false;
     [self.logview setEditable:false];
     [self.downloadScopeMenu setEnabled:false];
     self->download_files_total = 0;
-    self->download_files_done = 0;
+    self.download_files_done = 0;
     self->my_log_level = LOG_LEVEL_USer;//use LOG_LEVEL_ALL for debug
+    self.downloadTasks = [NSMutableArray array];
+    self.currentTasks = [NSMutableDictionary dictionary];
     
     [self loadconfig];
 
-    self.webview.identifier = @"w0";
+    self.webview1.identifier = @"w1";
     self.webview2.identifier = @"w2";
     self.webview3.identifier = @"w3";
     self.webview4.identifier = @"w4";
+    self->webviews = [NSMutableDictionary dictionaryWithObjectsAndKeys:self.webview1, self.webview1.identifier,
+                      self.webview2, self.webview2.identifier,
+                      self.webview3, self.webview3.identifier,
+                      self.webview4, self.webview4.identifier, nil];
+    self->pagePIs = [NSMutableDictionary dictionaryWithObjectsAndKeys:self.pageload_PI1, self.webview1.identifier,
+                      self.pageload_PI2, self.webview2.identifier,
+                      self.pageload_PI3, self.webview3.identifier,
+                      self.pageload_PI4, self.webview4.identifier, nil];
 
+    
+    //thread
+    self->conditions = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSCondition new], self.webview1.identifier,
+                        [NSCondition new], self.webview2.identifier,
+                        [NSCondition new], self.webview3.identifier,
+                        [NSCondition new], self.webview4.identifier, nil];
+    
     //load webview
     NSString *urlText = [NSString stringWithFormat:@"%@/ws/login?wanted=assignments_projects", self->domain];
-    [[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlText]]];
+    [[self.webview1 mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlText]]];
 }
 
 - (void)loadconfig{    
@@ -73,7 +96,6 @@ typedef enum : NSUInteger {
     self->domain = [theDict objectForKey:@"domain"];
     self->username = [theDict objectForKey:@"username"];
     self->pwd = [theDict objectForKey:@"password"];
-
 }
 
 
@@ -81,11 +103,42 @@ typedef enum : NSUInteger {
     // Insert code here to tear down your application
 }
 
+//thread control
+- (void)do_downloadTask_thread:(NSString *)key{
+    NSLog(@"in thread %@", key);
+    NSCondition *condition = (NSCondition*)[self->conditions objectForKey:key];
+
+    while (true) {
+        [condition lock];
+        
+        Boolean runningStatus = [self->threadStatus[key] boolValue];
+        while(runningStatus){
+            NSLog(@"thread %@ wait for signal", key);
+            [condition wait];
+        }
+        
+        SDLDownloadFile *task;
+        //get a task, and do it
+        @synchronized (self.downloadTasks) {
+            if (self.downloadTasks.count == 0) {
+                break;
+            }
+            task = (SDLDownloadFile *)[self.downloadTasks objectAtIndex:0];
+            [self.downloadTasks removeObjectAtIndex:0];
+        }
+        
+        self->threadStatus[key] = @YES;
+        [condition unlock];
+
+        [self start_download_file:key task:task];
+    }
+    NSLog(@"exit thread %@", key);
+}
 
 //webview delegate
 - (void)webView:(WebView *)sender didStartProvisionalLoadForFrame:(WebFrame *)frame{
     [self appendToMyTextView:@"starting loading page..." log_level:LOG_LEVEL_ALL];
-    [self pageload_Progress:true];
+    [self pageload_Progress:true key:sender.identifier];
 }
 
 - (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error forFrame:(WebFrame *)frame{
@@ -94,29 +147,29 @@ typedef enum : NSUInteger {
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame{
-    self->currentUrl = [[[[frame dataSource] request] URL] absoluteString];
-    [self appendToMyTextView:[NSString stringWithFormat:@"finish loading %@", self->currentUrl] log_level:LOG_LEVEL_ALL];
+    NSString *currentUrl = [[[[frame dataSource] request] URL] absoluteString];
+    [self appendToMyTextView:[NSString stringWithFormat:@"finish loading %@", currentUrl] log_level:LOG_LEVEL_ALL];
     [self appendToMyTextView:sender.identifier log_level:LOG_LEVEL_USer];
 
-    [self pageload_Progress:false];
+    [self pageload_Progress:false key:sender.identifier];
     
-    if([self->currentUrl containsString:@"/ws/login"]){
-        //auto login
+    if([currentUrl containsString:@"/ws/login"] && [sender.identifier isEqual: @"w1"]){
+        //auto login by w1
         [self web_auto_login];
     }
-    else if([self->currentUrl containsString:@"/ws/assignments_project_info_scope"]){
+    else if([currentUrl containsString:@"/ws/assignments_project_info_scope"]){
         //download file
-        [self do_download_file];
+        [self do_download_file:sender];
     }
-    else if([self->currentUrl containsString:@"/ws/assignments_projects?"]){
-        self->mainUrl = self->currentUrl;
+    else if([currentUrl containsString:@"/ws/assignments_projects?"]){
+        self->mainUrl = currentUrl;
         //could enable download menu
         [self.downloadScopeMenu setEnabled:true];
         [self appendToMyTextView:@"You can select projects to download now." log_level:LOG_LEVEL_USer];
     }
-    else if([self->currentUrl containsString:@"/ws/assignments_tasks?"]){
+    else if([currentUrl containsString:@"/ws/assignments_tasks?"]){
         //navi to download files
-        [self navi_to_download_file];
+        [self navi_to_download_file:sender];
     }
 
 }
@@ -124,7 +177,7 @@ typedef enum : NSUInteger {
 //web inject function
 -(void)web_auto_login{
     [self appendToMyTextView:@"auto login..." log_level:LOG_LEVEL_USer];
-    DOMDocument *doc = [[self.webview mainFrame] DOMDocument];
+    DOMDocument *doc = [[self.webview1 mainFrame] DOMDocument];
     
     DOMHTMLInputElement *username_el = (DOMHTMLInputElement*)[doc getElementById:@"username"];
     [username_el setValue:self->username];
@@ -137,9 +190,9 @@ typedef enum : NSUInteger {
 }
 
 - (void)get_download_files{
-    [self->should_download_files removeAllObjects];//clear
+    [self.downloadTasks removeAllObjects];//clear
     
-    DOMDocument *doc = [[self.webview mainFrame] DOMDocument];
+    DOMDocument *doc = [[self.webview1 mainFrame] DOMDocument];
     DOMNodeList *tbodies = [doc getElementsByTagName:@"tbody"];
     for(int i=0; i< [tbodies length]; i++){
         DOMElement *el = (DOMElement*)[tbodies item:i];
@@ -158,7 +211,7 @@ typedef enum : NSUInteger {
                         sdlfile.url = [project_link href];
                         sdlfile.projectName = [project_link innerText];
                         sdlfile.projectID = [input getAttribute:@"value"];
-                        [self->should_download_files addObject:sdlfile];
+                        [self.downloadTasks addObject:sdlfile];
                     }
                 }
                 
@@ -167,17 +220,25 @@ typedef enum : NSUInteger {
         }
     }
     
-    self->download_files_total = [self->should_download_files count];
+    self->download_files_total = [self.downloadTasks count];
     if(self->download_files_total > 0){
-        [self download_Progress:(0.5 + self->download_files_done)/self->download_files_total];
-        [self start_download_file];
+        //reset thread status
+        self->threadStatus = [NSMutableDictionary dictionaryWithObjectsAndKeys: @YES, self.webview1.identifier,
+                              @YES,self.webview2.identifier,
+                              @YES,self.webview3.identifier,
+                              @YES,self.webview4.identifier, nil];
+        
+        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview1.identifier];
+        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview2.identifier];
+        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview3.identifier];
+        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview4.identifier];
     }
 }
 
 //open assignments_tasks page & click "View scoping information" link
--(void)navi_to_download_file{
-    [self appendToMyTextView:self->currentUrl log_level:LOG_LEVEL_ALL];
-    DOMDocument *doc = [[self.webview mainFrame] DOMDocument];
+-(void)navi_to_download_file:(WebView *)a_webview{
+    //[self appendToMyTextView:self->currentUrl log_level:LOG_LEVEL_ALL];
+    DOMDocument *doc = [[a_webview mainFrame] DOMDocument];
 
     DOMNodeList *a_list = [doc getElementsByTagName:@"a"];
     for(int i=0; i< [a_list length]; i++){
@@ -185,16 +246,15 @@ typedef enum : NSUInteger {
         NSString *href = [link href];
         if([href containsString:@"assignments_project_info_scope"]){
             //open it
-            //[[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
-            [[self.webview2 mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
+            [[a_webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
             return;
         }
     }
 }
 
 //download file
--(void)do_download_file{
-    DOMDocument *doc = [[self.webview mainFrame] DOMDocument];
+-(void)do_download_file:(WebView *)a_webview {
+    DOMDocument *doc = [[a_webview mainFrame] DOMDocument];
     DOMNodeList *a_list = [doc getElementsByClassName:@"button"];
     DOMHTMLLinkElement *link = (DOMHTMLLinkElement *)[a_list item:0];
 
@@ -217,8 +277,9 @@ typedef enum : NSUInteger {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
             NSString *cd = [[httpResponse allHeaderFields] valueForKey:@"Content-Disposition"];
             NSString *filename = [[cd componentsSeparatedByString:@"''"] lastObject];
+            SDLDownloadFile *task = (SDLDownloadFile*)[self.currentTasks objectForKey:a_webview.identifier];
             filename = [filename stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            filename = [NSString stringWithFormat:@"%@%@", self->current_download_task.projectID, filename];
+            filename = [NSString stringWithFormat:@"%@%@", task.projectID, filename];
             
             NSString *homeDirectory = NSHomeDirectory();
             NSString *destinationFileName = [[homeDirectory stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:filename];
@@ -227,38 +288,32 @@ typedef enum : NSUInteger {
             NSFileManager *fileManager = [NSFileManager defaultManager];
             [fileManager moveItemAtURL:location toURL:toURL error:&error];
             
-            self->download_files_done++;
-            [self download_Progress: (self->download_files_done+0.0)/self->download_files_total ];
-            [self pageload_Progress:false];
+            self.download_files_done++;
+            [self download_Progress: (self.download_files_done+0.0)/self->download_files_total ];
+            [self pageload_Progress:false key:a_webview.identifier];
             [self appendToMyTextView: [NSString stringWithFormat:@"success download %@\n", filename] log_level:LOG_LEVEL_USer];
 
-            NSLog(@"File Downloaded Succesfully");
-                                                        
-            //download another file
-            [self start_download_file];
+            
+            //reset thread signal
+            NSCondition *condition = (NSCondition*)[self->conditions objectForKey:a_webview.identifier];
+            [condition lock];
+            self->threadStatus[a_webview.identifier] = @NO;
+            [condition signal];
+            [condition unlock];
+            
+            NSLog(@"[thread %@] send signal because file downloaded succesfully", a_webview.identifier);
     }];
     [dataTask resume];
 }
 
--(void)start_download_file{
+-(void)start_download_file:(NSString *)key task:(SDLDownloadFile *)sdlfile{
     dispatch_async(dispatch_get_main_queue(), ^{
-        SDLDownloadFile *sdlfile = (SDLDownloadFile*)[self->should_download_files firstObject];
-        if(sdlfile){
-            [self->should_download_files removeObjectAtIndex:0];
-            [self appendToMyTextView: [NSString stringWithFormat:@"downloading %@", sdlfile.url] log_level:LOG_LEVEL_ALL];
-            [self appendToMyTextView: [NSString stringWithFormat:@"start to download project : %@ %@", sdlfile.projectID ,sdlfile.projectName] log_level:LOG_LEVEL_USer];
-            [self pageload_Progress:true];
-            self->current_download_task = sdlfile;
-            [[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:sdlfile.url]]];
-        }
-        else{
-            //return to main page
-            [self appendToMyTextView:@"finish all download tasks. return to main page..." log_level:LOG_LEVEL_USer];
-            [self download_Progress:1];
-            self->is_download_scope = false;
-            self->current_download_task = nil;
-            [[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self->mainUrl]]];
-        }
+        [self.currentTasks setObject:sdlfile forKey:key];
+        [self appendToMyTextView: [NSString stringWithFormat:@"downloading %@", sdlfile.url] log_level:LOG_LEVEL_ALL];
+        [self appendToMyTextView: [NSString stringWithFormat:@"start to download project : %@ %@", sdlfile.projectID ,sdlfile.projectName] log_level:LOG_LEVEL_USer];
+        [self pageload_Progress:true key:key];
+        WebView *a_webview = (WebView*)[self->webviews objectForKey:key];
+        [[a_webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:sdlfile.url]]];
     });
 }
 
@@ -267,22 +322,15 @@ typedef enum : NSUInteger {
 -(IBAction)m_download_scope:(id)sender{
     //[self appendToMyTextView:@"download menu clic"];
     NSLog(@"download menu click");
-    self->is_download_scope = true;
-    [self.downloadScopeMenu setEnabled:false];
-
-    //check url
-    if([self->currentUrl containsString:@"/ws/assignments_projects?"]){
-        [self get_download_files];
-    }
-    else{
-        self->is_download_scope = false;
-    }
+    //[self.downloadScopeMenu setEnabled:false];
+    [self get_download_files];
+    //[self.downloadScopeMenu setEnabled:true];
 }
 
 -(IBAction)m_refresh:(id)sender{
     //[self appendToMyTextView:@"download menu clic"];
     NSLog(@"refresh menu click");
-    [[self.webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self->currentUrl]]];
+    [self.webview1 reload:sender];
 }
 
 - (void)appendToMyTextView:(NSString*)text log_level:(LOG_LEVEL)log_level
@@ -297,13 +345,14 @@ typedef enum : NSUInteger {
     }
 }
 
-- (void)pageload_Progress:(Boolean)b_start{
+- (void)pageload_Progress:(Boolean)b_start key:(NSString *)key{
+    NSProgressIndicator *pi = (NSProgressIndicator *)[self->pagePIs objectForKey:key];
     dispatch_async(dispatch_get_main_queue(), ^{
         if(b_start){
-            [self.pageload_PI startAnimation:self];
+            [pi startAnimation:self];
         }
         else{
-            [self.pageload_PI stopAnimation:self];
+            [pi stopAnimation:self];
         }
     });
 }
