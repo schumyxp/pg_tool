@@ -322,9 +322,8 @@ typedef enum : NSUInteger {
 -(IBAction)m_download_scope:(id)sender{
     //[self appendToMyTextView:@"download menu clic"];
     NSLog(@"download menu click");
-    //[self.downloadScopeMenu setEnabled:false];
+    [self.downloadScopeMenu setEnabled:false];
     [self get_download_files];
-    //[self.downloadScopeMenu setEnabled:true];
 }
 
 -(IBAction)m_refresh:(id)sender{
@@ -360,6 +359,9 @@ typedef enum : NSUInteger {
 - (void)download_Progress:(double)percent{
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.download_PI setDoubleValue:percent];
+        if(percent > 0.99){
+            [self.downloadScopeMenu setEnabled:true];
+        }
     });
 }
 
