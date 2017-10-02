@@ -86,7 +86,7 @@ typedef enum : NSUInteger {
                         [NSCondition new], self.webview4.identifier, nil];
     
     //load webview
-    NSString *urlText = [NSString stringWithFormat:@"%@/ws/login?wanted=assignments_projects", self->domain];
+    NSString *urlText = [NSString stringWithFormat:@"%@/ws-legacy/login", self->domain];
     [[self.webview1 mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlText]]];
 }
 
@@ -153,30 +153,38 @@ typedef enum : NSUInteger {
 
     [self pageload_Progress:false key:sender.identifier];
     
-    if([currentUrl containsString:@"/ws/login"] && [sender.identifier isEqual: @"w1"]){
-        //auto login by w1
+    if([currentUrl containsString:@"/ws-legacy/login"] && [sender.identifier isEqual: @"w1"]){
+        //auto login to home by w1
         [self web_auto_login];
     }
-    else if([currentUrl containsString:@"/ws/assignments_project_info_scope"]){
-        //download file
-        [self do_download_file:sender];
+    else if([currentUrl containsString:@"/ws-legacy/home?"]){
+        //from home navi to assignments page
+        [self navi_to_assignments_page:sender];
     }
-    else if([currentUrl containsString:@"/ws/assignments_projects?"]){
+    else if([currentUrl containsString:@"/ws-legacy/assignments?"]){
+        //from assignments navi to assignments_projects page
+        [self navi_to_assignments_projects_page:sender];
+    }
+    else if([currentUrl containsString:@"/ws-legacy/assignments_projects?"]){
         self->mainUrl = currentUrl;
         //could enable download menu
         [self.downloadScopeMenu setEnabled:true];
         [self appendToMyTextView:@"You can select projects to download now." log_level:LOG_LEVEL_USer];
     }
-    else if([currentUrl containsString:@"/ws/assignments_tasks?"]){
-        //navi to download files
+    else if([currentUrl containsString:@"/ws-legacy/assignments_tasks?"]){
+        //from assignments_tasks navi to download page
         [self navi_to_download_file:sender];
     }
-
+    else if([currentUrl containsString:@"/ws-legacy/assignments_project_info_scope"]){
+        //download file
+        [self do_download_file:sender];
+    }
 }
 
 //web inject function
+//from login to home
 -(void)web_auto_login{
-    [self appendToMyTextView:@"auto login..." log_level:LOG_LEVEL_USer];
+    [self appendToMyTextView:@"auto loading..." log_level:LOG_LEVEL_USer];
     DOMDocument *doc = [[self.webview1 mainFrame] DOMDocument];
     
     DOMHTMLInputElement *username_el = (DOMHTMLInputElement*)[doc getElementById:@"username"];
@@ -187,6 +195,50 @@ typedef enum : NSUInteger {
     
     DOMHTMLFormElement *form = (DOMHTMLFormElement *)[doc getElementById:@"loginForm"];
     [form submit];
+}
+
+//from home to assignments
+-(void)navi_to_assignments_page:(WebView *)a_webview{
+    [self appendToMyTextView:@"auto loading..." log_level:LOG_LEVEL_USer];
+    DOMDocument *doc = [[self.webview1 mainFrame] DOMDocument];
+    
+    DOMHTMLLinkElement *idAssignments = (DOMHTMLLinkElement*)[doc getElementById:@"idAssignments"];
+    [idAssignments click];
+}
+
+//from assignments to assignments_projects
+-(void)navi_to_assignments_projects_page:(WebView *)a_webview{
+    [self appendToMyTextView:@"auto loading..." log_level:LOG_LEVEL_USer];
+    DOMDocument *doc = [[self.webview1 mainFrame] DOMDocument];
+    
+    //find projects link
+    DOMNodeList *links = [doc getElementsByTagName:@"a"];
+    for(int i=0; i< [links length]; i++){
+        DOMElement *el = (DOMElement*)[links item:i];
+        NSString *href = [el getAttribute:@"href"];
+        if([href containsString:@"assignments_projects"]){
+            DOMHTMLLinkElement* assignments_projects = (DOMHTMLLinkElement*)el;
+            [assignments_projects click];
+            return;
+        }
+    }
+}
+
+//open assignments_tasks page & click "View scoping information" link
+-(void)navi_to_download_file:(WebView *)a_webview{
+    [self appendToMyTextView:@"auto loading..." log_level:LOG_LEVEL_ALL];
+    DOMDocument *doc = [[a_webview mainFrame] DOMDocument];
+    
+    DOMNodeList *a_list = [doc getElementsByTagName:@"a"];
+    for(int i=0; i< [a_list length]; i++){
+        DOMHTMLLinkElement *link = (DOMHTMLLinkElement *)[a_list item:i];
+        NSString *href = [link href];
+        if([href containsString:@"assignments_project_info_scope"]){
+            //open it
+            [[a_webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
+            return;
+        }
+    }
 }
 
 - (void)get_download_files{
@@ -200,7 +252,6 @@ typedef enum : NSUInteger {
         if([tbody_id containsString:@"_tbody"]){
             if(![tbody_id containsString:@"_message_tbody"]){
                 //find it
-                
                 DOMNodeList *trs = [el getElementsByTagName:@"tr"];
                 for(int j=0; j < [trs length];j++){
                     DOMElement *tr = (DOMElement*)[trs item:j];
@@ -214,7 +265,6 @@ typedef enum : NSUInteger {
                         [self.downloadTasks addObject:sdlfile];
                     }
                 }
-                
                 break;
             }
         }
@@ -235,22 +285,9 @@ typedef enum : NSUInteger {
     }
 }
 
-//open assignments_tasks page & click "View scoping information" link
--(void)navi_to_download_file:(WebView *)a_webview{
-    //[self appendToMyTextView:self->currentUrl log_level:LOG_LEVEL_ALL];
-    DOMDocument *doc = [[a_webview mainFrame] DOMDocument];
 
-    DOMNodeList *a_list = [doc getElementsByTagName:@"a"];
-    for(int i=0; i< [a_list length]; i++){
-        DOMHTMLLinkElement *link = (DOMHTMLLinkElement *)[a_list item:i];
-        NSString *href = [link href];
-        if([href containsString:@"assignments_project_info_scope"]){
-            //open it
-            [[a_webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:href]]];
-            return;
-        }
-    }
-}
+
+
 
 //download file
 -(void)do_download_file:(WebView *)a_webview {
@@ -268,7 +305,7 @@ typedef enum : NSUInteger {
             break;
         }
     }
-    NSString *urlText = [NSString stringWithFormat:@"%@/ws/%@", self->domain, downlink];
+    NSString *urlText = [NSString stringWithFormat:@"%@/ws-legacy/%@", self->domain, downlink];
     
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDownloadTask *dataTask = [session downloadTaskWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlText]]
