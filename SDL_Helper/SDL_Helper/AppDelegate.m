@@ -135,6 +135,22 @@ typedef enum : NSUInteger {
     NSLog(@"exit thread %@", key);
 }
 
+- (void)do_download_by_mainwebview:(NSString *)key{
+    NSLog(@"in do_download_by_mainwebview thread %@", key);
+    
+    if(self.downloadTasks.count > 0) {
+        SDLDownloadFile *task = (SDLDownloadFile *)[self.downloadTasks objectAtIndex:0];
+        [self.downloadTasks removeObjectAtIndex:0];
+        [self start_download_file:key task:task];
+    }
+    else{
+        [self download_Progress:0];
+        self.download_files_done = 0.0;
+        self->download_files_total = 0.0;
+    }
+    NSLog(@"exit thread %@", key);
+}
+
 //webview delegate
 - (void)webView:(WebView *)sender didStartProvisionalLoadForFrame:(WebFrame *)frame{
     [self appendToMyTextView:@"starting loading page..." log_level:LOG_LEVEL_ALL];
@@ -278,15 +294,14 @@ typedef enum : NSUInteger {
                               @NO,self.webview3.identifier,
                               @NO,self.webview4.identifier, nil];
         
-        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview1.identifier];
-        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview2.identifier];
-        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview3.identifier];
-        [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview4.identifier];
+        //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview1.identifier];
+        //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview2.identifier];
+        //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview3.identifier];
+        //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview4.identifier];
+        
+        [NSThread detachNewThreadSelector:@selector(do_download_by_mainwebview:) toTarget:self withObject:self.webview2.identifier];
     }
 }
-
-
-
 
 
 //download file
@@ -340,6 +355,9 @@ typedef enum : NSUInteger {
             [condition unlock];
             
             NSLog(@"[thread %@] send signal because file downloaded succesfully", taskID);
+            
+            //download by main webview
+            [NSThread detachNewThreadSelector:@selector(do_download_by_mainwebview:) toTarget:self withObject:taskID];
     }];
     [dataTask resume];
 }
@@ -348,7 +366,7 @@ typedef enum : NSUInteger {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.currentTasks setObject:sdlfile forKey:key];
         [self appendToMyTextView: [NSString stringWithFormat:@"downloading %@", sdlfile.url] log_level:LOG_LEVEL_ALL];
-        [self appendToMyTextView: [NSString stringWithFormat:@"start to download project : %@ %@", sdlfile.projectID ,sdlfile.projectName] log_level:LOG_LEVEL_USer];
+        [self appendToMyTextView: [NSString stringWithFormat:@"start to download project by %@: %@ %@", key, sdlfile.projectID ,sdlfile.projectName] log_level:LOG_LEVEL_USer];
         [self pageload_Progress:true key:key];
         WebView *a_webview = (WebView*)[self->webviews objectForKey:key];
         [[a_webview mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:sdlfile.url]]];
