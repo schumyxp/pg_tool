@@ -148,7 +148,7 @@ typedef enum : NSUInteger {
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame{
     NSString *currentUrl = [[[[frame dataSource] request] URL] absoluteString];
-    [self appendToMyTextView:[NSString stringWithFormat:@"finish loading %@", currentUrl] log_level:LOG_LEVEL_ALL];
+    [self appendToMyTextView:[NSString stringWithFormat:@"%@ finish loading %@", sender.identifier, currentUrl] log_level:LOG_LEVEL_ALL];
     [self appendToMyTextView:sender.identifier log_level:LOG_LEVEL_USer];
 
     [self pageload_Progress:false key:sender.identifier];
@@ -226,7 +226,7 @@ typedef enum : NSUInteger {
 
 //open assignments_tasks page & click "View scoping information" link
 -(void)navi_to_download_file:(WebView *)a_webview{
-    [self appendToMyTextView:@"auto loading..." log_level:LOG_LEVEL_ALL];
+    [self appendToMyTextView:[NSString stringWithFormat:@"%@ auto loading...", a_webview.identifier] log_level:LOG_LEVEL_ALL];
     DOMDocument *doc = [[a_webview mainFrame] DOMDocument];
     
     DOMNodeList *a_list = [doc getElementsByTagName:@"a"];
@@ -273,10 +273,10 @@ typedef enum : NSUInteger {
     self->download_files_total = [self.downloadTasks count];
     if(self->download_files_total > 0){
         //reset thread status
-        self->threadStatus = [NSMutableDictionary dictionaryWithObjectsAndKeys: @YES, self.webview1.identifier,
-                              @YES,self.webview2.identifier,
-                              @YES,self.webview3.identifier,
-                              @YES,self.webview4.identifier, nil];
+        self->threadStatus = [NSMutableDictionary dictionaryWithObjectsAndKeys: @NO, self.webview1.identifier,
+                              @NO,self.webview2.identifier,
+                              @NO,self.webview3.identifier,
+                              @NO,self.webview4.identifier, nil];
         
         [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview1.identifier];
         [NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview2.identifier];
@@ -306,6 +306,7 @@ typedef enum : NSUInteger {
         }
     }
     NSString *urlText = [NSString stringWithFormat:@"%@/ws-legacy/%@", self->domain, downlink];
+    NSString *taskID = a_webview.identifier;
     
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDownloadTask *dataTask = [session downloadTaskWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlText]]
@@ -314,7 +315,7 @@ typedef enum : NSUInteger {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
             NSString *cd = [[httpResponse allHeaderFields] valueForKey:@"Content-Disposition"];
             NSString *filename = [[cd componentsSeparatedByString:@"''"] lastObject];
-            SDLDownloadFile *task = (SDLDownloadFile*)[self.currentTasks objectForKey:a_webview.identifier];
+            SDLDownloadFile *task = (SDLDownloadFile*)[self.currentTasks objectForKey:taskID];
             filename = [filename stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             filename = [NSString stringWithFormat:@"%@%@", task.projectID, filename];
             
@@ -327,18 +328,18 @@ typedef enum : NSUInteger {
             
             self.download_files_done++;
             [self download_Progress: (self.download_files_done+0.0)/self->download_files_total ];
-            [self pageload_Progress:false key:a_webview.identifier];
+            [self pageload_Progress:false key:taskID];
             [self appendToMyTextView: [NSString stringWithFormat:@"success download %@\n", filename] log_level:LOG_LEVEL_USer];
 
             
             //reset thread signal
-            NSCondition *condition = (NSCondition*)[self->conditions objectForKey:a_webview.identifier];
+            NSCondition *condition = (NSCondition*)[self->conditions objectForKey:taskID];
             [condition lock];
-            self->threadStatus[a_webview.identifier] = @NO;
+            self->threadStatus[taskID] = @NO;
             [condition signal];
             [condition unlock];
             
-            NSLog(@"[thread %@] send signal because file downloaded succesfully", a_webview.identifier);
+            NSLog(@"[thread %@] send signal because file downloaded succesfully", taskID);
     }];
     [dataTask resume];
 }
