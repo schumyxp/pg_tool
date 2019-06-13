@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,6 +16,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="downloadAssetsMenu" destination="hXI-li-kXn" id="Bni-JQ-Z4d"/>
                 <outlet property="downloadScopeMenu" destination="Gi5-1S-RQB" id="2ry-5m-Mu8"/>
                 <outlet property="download_PI" destination="JGd-GJ-Vad" id="CPx-gG-v9O"/>
                 <outlet property="logview" destination="Wol-VP-0Zd" id="bJx-AZ-eqa"/>
@@ -369,6 +370,12 @@
                                     <action selector="m_download_scope:" target="Voe-Tx-rLC" id="iTq-t2-f3a"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Download_assets" id="hXI-li-kXn">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="m_download_assets:" target="Voe-Tx-rLC" id="Xj4-FB-iVv"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Refresh" id="Fal-I4-PZk">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -516,11 +523,11 @@
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="zxH-UV-RNB">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="zxH-UV-RNB">
                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="xrF-IK-1OV">
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="xrF-IK-1OV">
                             <rect key="frame" x="232" y="1" width="16" height="710"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>

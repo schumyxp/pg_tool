@@ -12,6 +12,7 @@
 
 //menu
 -(IBAction)m_download_scope:(id)sender;
+-(IBAction)m_download_assets:(id)sender;
 -(IBAction)m_refresh:(id)sender;
 
 @end
