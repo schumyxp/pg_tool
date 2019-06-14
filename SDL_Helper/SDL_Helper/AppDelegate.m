@@ -57,6 +57,8 @@ typedef enum : NSUInteger {
     // Insert code here to initialize your application
     [self.logview setEditable:false];
     [self.downloadScopeMenu setEnabled:false];
+    [self.downloadAssetsMenu setEnabled:false];
+
     self->download_files_total = 0;
     self.download_files_done = 0;
     self->my_log_level = LOG_LEVEL_USer;//use LOG_LEVEL_ALL for debug
@@ -181,6 +183,8 @@ typedef enum : NSUInteger {
         self->mainUrl = currentUrl;
         //could enable download menu
         [self.downloadScopeMenu setEnabled:true];
+        [self.downloadAssetsMenu setEnabled:true];
+
         [self appendToMyTextView:@"You can select projects to download now." log_level:LOG_LEVEL_USer];
     }
     else if([currentUrl containsString:@"/ws-legacy/assignments_tasks?"]){
@@ -188,7 +192,7 @@ typedef enum : NSUInteger {
             //from assignments_tasks navi to download page
             [self navi_to_download_file:sender];
         }
-        else{
+        else if([sender.identifier containsString:@"w3"]){
             //download source
             [self navi_to_download_source:sender];
         }
@@ -268,18 +272,31 @@ typedef enum : NSUInteger {
     [self appendToMyTextView:[NSString stringWithFormat:@"%@ auto loading...", a_webview.identifier] log_level:LOG_LEVEL_ALL];
     DOMDocument *doc = [[a_webview mainFrame] DOMDocument];
     
-    DOMNodeList *checkBoxs = [doc getElementsByName:@"checkAllBox"];
-    DOMHTMLInputElement *checkAllBox = (DOMHTMLInputElement *)[checkBoxs item:0];
+    DOMNodeList *checkBoxs = [doc getElementsByName:@"checkbox"];
+    if([checkBoxs length] < 1){
+        NSString *taskID = a_webview.identifier;
+        self.download_files_done++;
+        [self download_Progress: (self.download_files_done+0.0)/self->download_files_total ];
+        [self pageload_Progress:false key:taskID];
+        NSLog(@"[thread %@] send signal because file downloaded succesfully", taskID);
+        //download by main webview
+        [NSThread detachNewThreadSelector:@selector(do_download_by_mainwebview:) toTarget:self withObject:taskID];
+        return;
+    }
+    
+    DOMNodeList *checkAllBox_l = [doc getElementsByName:@"checkAllBox"];
+    DOMHTMLInputElement *checkAllBox = (DOMHTMLInputElement *)[checkAllBox_l item:0];
     [checkAllBox click];
     
     DOMNodeList *forms = [doc getElementsByTagName:@"form"];
     DOMHTMLFormElement *form = (DOMHTMLFormElement *)[forms item:0];
     [form setTarget:@"_self"];
     [form submit];
+    //NSLog(@"%@",[form target]);
 }
 
 
-- (void)get_download_files{
+- (void)get_download_files:(int) kind{
     [self.downloadTasks removeAllObjects];//clear
     
     DOMDocument *doc = [[self.webview1 mainFrame] DOMDocument];
@@ -297,11 +314,11 @@ typedef enum : NSUInteger {
                     if([input checked]){
                         DOMHTMLLinkElement *project_link = (DOMHTMLLinkElement*)[tr querySelector:@"a"];
                         NSString* projectID = [input getAttribute:@"value"];
-                        /*
-                        if([self check_file_exist:projectID]){
+                        
+                        if([self check_file_exist:projectID kind:kind]){
                             continue;
                         }
-                        */
+                        
                         SDLDownloadFile *sdlfile = [SDLDownloadFile new];
                         sdlfile.url = [project_link href];
                         sdlfile.projectName = [project_link innerText];
@@ -325,17 +342,22 @@ typedef enum : NSUInteger {
         //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview2.identifier];
         //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview3.identifier];
         //[NSThread detachNewThreadSelector:@selector(do_downloadTask_thread:) toTarget:self withObject:self.webview4.identifier];
-        
-        [NSThread detachNewThreadSelector:@selector(do_download_by_mainwebview:) toTarget:self withObject:self.webview2.identifier];
+        if(kind == 1){
+            [NSThread detachNewThreadSelector:@selector(do_download_by_mainwebview:) toTarget:self withObject:self.webview2.identifier];
+        }
+        else{
+            [NSThread detachNewThreadSelector:@selector(do_download_by_mainwebview:) toTarget:self withObject:self.webview3.identifier];
+        }
     }
     else{
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.downloadScopeMenu setEnabled:true];
+            [self.downloadAssetsMenu setEnabled:true];
         });
     }
 }
 
-- (BOOL)check_file_exist:(NSString *)projectID{
+- (BOOL)check_file_exist:(NSString *)projectID kind:(int)kind{
     NSString *destinationDir = [self get_file_save_dir];
     
     NSFileManager* fileManager = [NSFileManager defaultManager];
@@ -345,8 +367,9 @@ typedef enum : NSUInteger {
     if (error) {
         NSLog(@"getFileListInFolderWithPathFailed, errorInfo:%@",error);
     }
+    NSString * ext = kind == 1 ? @"cvs":@"zip";
     for(NSString *file in fileList){
-        NSRange range =[file rangeOfString:projectID];
+        NSRange range =[file rangeOfString:[NSString stringWithFormat:@"%@.%@" , projectID, ext]];
         if(range.location == 0){
             //start with project ID, find it.
             return YES;
@@ -410,13 +433,14 @@ typedef enum : NSUInteger {
             [self pageload_Progress:false key:taskID];
             [self appendToMyTextView: [NSString stringWithFormat:@"success download %@\n", filename] log_level:LOG_LEVEL_USer];
 
-            
+            /*
             //reset thread signal
             NSCondition *condition = (NSCondition*)[self->conditions objectForKey:taskID];
             [condition lock];
             self->threadStatus[taskID] = @NO;
             [condition signal];
             [condition unlock];
+            */
             
             NSLog(@"[thread %@] send signal because file downloaded succesfully", taskID);
             
@@ -482,14 +506,14 @@ typedef enum : NSUInteger {
                                                             [self pageload_Progress:false key:taskID];
                                                             [self appendToMyTextView: [NSString stringWithFormat:@"success download %@\n", filename] log_level:LOG_LEVEL_USer];
                                                             
-                                                            
+                                                            /*
                                                             //reset thread signal
                                                             NSCondition *condition = (NSCondition*)[self->conditions objectForKey:taskID];
                                                             [condition lock];
                                                             self->threadStatus[taskID] = @NO;
                                                             [condition signal];
                                                             [condition unlock];
-                                                            
+                                                            */
                                                             NSLog(@"[thread %@] send signal because file downloaded succesfully", taskID);
                                                             
                                                             //download by main webview
@@ -502,13 +526,16 @@ typedef enum : NSUInteger {
     //[self appendToMyTextView:@"download menu clic"];
     NSLog(@"download scope menu click");
     [self.downloadScopeMenu setEnabled:false];
-    [self get_download_files];
+    [self.downloadAssetsMenu setEnabled:false];
+
+    [self get_download_files:1];
 }
 
 -(IBAction)m_download_assets:(id)sender{
     NSLog(@"download assets menu click");
+    [self.downloadScopeMenu setEnabled:false];
     [self.downloadAssetsMenu setEnabled:false];
-    [self get_download_files];
+    [self get_download_files:2];
 }
 
 -(IBAction)m_refresh:(id)sender{
@@ -546,6 +573,7 @@ typedef enum : NSUInteger {
         [self.download_PI setDoubleValue:percent];
         if(percent > 0.99){
             [self.downloadScopeMenu setEnabled:true];
+            [self.downloadAssetsMenu setEnabled:true];
         }
     });
 }

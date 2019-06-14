@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -27,7 +27,6 @@
                 <outlet property="webview1" destination="2Nt-LY-uLh" id="E2p-Oe-tBc"/>
                 <outlet property="webview2" destination="LGF-FJ-3Ac" id="Jrq-gB-2yQ"/>
                 <outlet property="webview3" destination="59U-p0-IAZ" id="Cup-vU-1Fy"/>
-                <outlet property="webview4" destination="g1n-tE-MuX" id="Zbi-SD-jca"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -405,7 +404,7 @@
                             <menuItem title="Show Sidebar" keyEquivalent="s" id="kIP-vf-haE">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
-                                    <action selector="toggleSourceList:" target="-1" id="iwa-gc-5KM"/>
+                                    <action selector="toggleSidebar:" target="-1" id="iwa-gc-5KM"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
@@ -459,10 +458,10 @@
         <window title="SDL_Helper" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="1400" height="797"/>
+            <rect key="contentRect" x="335" y="390" width="1401" height="763"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="1400" height="797"/>
+                <rect key="frame" x="0.0" y="0.0" width="1401" height="763"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2Nt-LY-uLh">
@@ -478,11 +477,11 @@
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="L7w-8y-LsU">
-                        <rect key="frame" x="554" y="422" width="16" height="16"/>
+                        <rect key="frame" x="555" y="403" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LGF-FJ-3Ac">
-                        <rect key="frame" x="576" y="415" width="560" height="340"/>
+                        <rect key="frame" x="576" y="411" width="560" height="344"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <webPreferences key="preferences" identifier="w1" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0"/>
                         <connections>
@@ -490,54 +489,46 @@
                         </connections>
                     </webView>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="pBI-0b-ibB">
-                        <rect key="frame" x="1120" y="422" width="16" height="16"/>
+                        <rect key="frame" x="1121" y="403" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="Jen-zR-xK3">
-                        <rect key="frame" x="554" y="44" width="16" height="16"/>
+                        <rect key="frame" x="555" y="42" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
-                    <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g1n-tE-MuX">
-                        <rect key="frame" x="576" y="43" width="560" height="360"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <webPreferences key="preferences" identifier="w1" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0"/>
-                        <connections>
-                            <outlet property="frameLoadDelegate" destination="Voe-Tx-rLC" id="c7S-dE-XoM"/>
-                        </connections>
-                    </webView>
                     <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wfE-Pr-dgG">
-                        <rect key="frame" x="1144" y="43" width="249" height="712"/>
+                        <rect key="frame" x="1144" y="35" width="249" height="720"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <clipView key="contentView" ambiguous="YES" id="Ur5-Bm-4pF">
-                            <rect key="frame" x="1" y="1" width="247" height="710"/>
+                        <clipView key="contentView" ambiguous="YES" drawsBackground="NO" id="Ur5-Bm-4pF">
+                            <rect key="frame" x="1" y="1" width="247" height="718"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="Wol-VP-0Zd">
-                                    <rect key="frame" x="0.0" y="0.0" width="247" height="710"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="247" height="718"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="247" height="710"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="247" height="718"/>
                                     <size key="maxSize" width="952" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="zxH-UV-RNB">
                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="xrF-IK-1OV">
-                            <rect key="frame" x="232" y="1" width="16" height="710"/>
+                            <rect key="frame" x="232" y="1" width="16" height="718"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="YD5-7N-g4S">
-                        <rect key="frame" x="1120" y="44" width="16" height="16"/>
+                        <rect key="frame" x="1121" y="42" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="59U-p0-IAZ">
-                        <rect key="frame" x="576" y="47" width="560" height="360"/>
+                        <rect key="frame" x="576" y="35" width="560" height="368"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <webPreferences key="preferences" identifier="w0" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0"/>
                         <connections>
@@ -546,7 +537,7 @@
                     </webView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="559" y="628.5"/>
+            <point key="canvasLocation" x="559.5" y="645.5"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="zB8-K4-8Nn"/>
     </objects>
